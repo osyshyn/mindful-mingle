@@ -1,0 +1,34 @@
+name: Daily Tip Generator
+
+on:
+  schedule:
+    - cron: '0 15 * * *'  # Daily at 08:00 AM MST
+  workflow_dispatch:
+
+jobs:
+  run-daily-tip-function:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Supabase Edge Function to generate tip
+        id: generate-tip
+        run: |
+          curl -X POST https://utabixrzkbifmcfbbqhm.supabase.co/functions/v1/generate-daily-tip \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json"
+
+      - name: Send email on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtppro.zoho.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "❌ MindfulMingle: Daily Tip Failed"
+          to: admin@mindfulmingle.ai
+          from: "MindfulMingle Bot <admin@mindfulmingle.ai>"
+          body: |
+            The daily EQ tip generation failed in GitHub Actions.
+            Please review the logs:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
