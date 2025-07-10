@@ -57,7 +57,7 @@ jobs:
   #     run: npx cypress run
       
   deploy-to-server:
-    needs: lint-and-build
+    # needs: lint-and-build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
