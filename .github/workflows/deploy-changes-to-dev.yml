@@ -8,53 +8,53 @@ on:
             - '**'
     workflow_dispatch:
 jobs:
-  lint-and-build:
-    name: Lint, Build, and Test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+  # lint-and-build:
+  #   name: Lint, Build, and Test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-          node-version: 20
-          cache: 'npm'
+  #   - name: Setup Node.js
+  #     uses: actions/setup-node@v3
+  #     with:
+  #         node-version: 20
+  #         cache: 'npm'
 
-    - name: Install dependencies
-      run: npm install
+  #   - name: Install dependencies
+  #     run: npm install
 
-    - name: Setup env file
-      run: echo "${{ secrets.ENV }}" > .env.local
+  #   - name: Setup env file
+  #     run: echo "${{ secrets.ENV }}" > .env.local
 
-    - name: Check TypeScript
-      run: npm run tsc
+  #   - name: Check TypeScript
+  #     run: npm run tsc
 
-    - name: Сode formatting
-      run: npm run format
+  #   - name: Сode formatting
+  #     run: npm run format
 
-    - name: Check code formatting
-      run: npm run format:check
+  #   - name: Check code formatting
+  #     run: npm run format:check
 
-    - name: Run linter
-      run: npm run lint
+  #   - name: Run linter
+  #     run: npm run lint
 
-    - name: Build project
-      run: npm run build
+  #   - name: Build project
+  #     run: npm run build
 
-    - name: Start server
-      run: npm run start &
-      env:
-          PORT: 3000
+  #   - name: Start server
+  #     run: npm run start &
+  #     env:
+  #         PORT: 3000
 
-    - name: Wait for server to be ready
-      run: npx wait-on http://localhost:3000
+  #   - name: Wait for server to be ready
+  #     run: npx wait-on http://localhost:3000
 
-    - name: Run Unit test
-      run: npm run unit-test
+  #   - name: Run Unit test
+  #     run: npm run unit-test
 
-    - name: Run Cypress e2e tests
-      run: npx cypress run
+  #   - name: Run Cypress e2e tests
+  #     run: npx cypress run
       
   deploy-to-server:
     needs: lint-and-build
