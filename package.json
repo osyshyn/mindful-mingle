@@ -4,16 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
+    
   },
   "dependencies": {
     "@stripe/stripe-js": "^2.4.0",
     "@supabase/supabase-js": "^2.39.7",
     "@tanstack/react-query": "^5.24.1",
-    "ai": "^2.2.36",
+    "ai": "^4.3.17",
     "chart.js": "^4.4.1",
     "date-fns": "^3.3.1",
     "lucide-react": "^0.344.0",
