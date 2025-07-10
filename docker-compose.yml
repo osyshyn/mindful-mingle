@@ -1,11 +1,11 @@
 services:
   app:
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     # image: frontend
     build:
       context: .
     container_name: frontend
     ports:
-      - 3000:3000
+      - 3000:5173
     restart: always
