@@ -1,0 +1,104 @@
+name: Deploy changes to Dev
+on:
+    push:
+        branches:
+            - '**'
+    pull_request:
+        branches:
+            - '**'
+    workflow_dispatch:
+jobs:
+  # lint-and-build:
+  #   name: Lint, Build, and Test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v3
+
+  #   - name: Setup Node.js
+  #     uses: actions/setup-node@v3
+  #     with:
+  #         node-version: 20
+  #         cache: 'npm'
+
+  #   - name: Install dependencies
+  #     run: npm install
+
+  #   - name: Setup env file
+  #     run: echo "${{ secrets.ENV }}" > .env.local
+
+  #   - name: Check TypeScript
+  #     run: npm run tsc
+
+  #   - name: Сode formatting
+  #     run: npm run format
+
+  #   - name: Check code formatting
+  #     run: npm run format:check
+
+  #   - name: Run linter
+  #     run: npm run lint
+
+  #   - name: Build project
+  #     run: npm run build
+
+  #   - name: Start server
+  #     run: npm run start &
+  #     env:
+  #         PORT: 3000
+
+  #   - name: Wait for server to be ready
+  #     run: npx wait-on http://localhost:3000
+
+  #   - name: Run Unit test
+  #     run: npm run unit-test
+
+  #   - name: Run Cypress e2e tests
+  #     run: npx cypress run
+      
+  deploy-to-server:
+    # needs: lint-and-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Get ssh key
+      run: |
+        echo "${{ secrets.SSH_KEY }}" > ../id_ed25519
+        chmod 600 ../id_ed25519
+
+    - name: Get repo name
+      run: |
+        echo "REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
+
+    - name: Get ec2 instance IP
+      run: |
+        PUBLIC_IP=$(aws ec2 describe-instances \
+          --filters "Name=tag:Name,Values=${{ env.REPO_NAME }}" "Name=instance-state-name,Values=running" \
+          --query "Reservations[0].Instances[0].PublicIpAddress" \
+          --output text)
+
+        echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
+
+    - name: Deploy to dev server
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ../id_ed25519 ubuntu@${{ env.PUBLIC_IP }} << 'EOF'
+        cd ~/${{ env.REPO_NAME }}
+        # git fetch origin
+        # git reset --hard origin/main
+        # git checkout main
+        git pull
+        echo "${{ secrets.ENV }}" > .env 
+        docker compose down
+        docker system prune -af && docker builder prune --all --force 
+        docker compose up -d --build
+        EOF
+        
