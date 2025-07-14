@@ -114,6 +114,11 @@ module "ec2_instance" {
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
 
+          # WebSocket headers
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+
           # Optional Timeouts
           send_timeout 5m;
           proxy_read_timeout 240;
