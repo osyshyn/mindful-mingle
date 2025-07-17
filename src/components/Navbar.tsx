@@ -1,58 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  MessageCircle, 
-  User, 
-  LogOut, 
-  Settings, 
-  Heart, 
-  Activity, 
-  BarChart2, 
+import {
+  MessageCircle,
+  Settings,
+  Heart,
+  Activity,
+  BarChart2,
   MessageSquareText,
   Menu,
   X,
-  LayoutDashboard
+  LayoutDashboard,
 } from 'lucide-react';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { supabase } from '../lib/supabase';
+import NavItem from './NavItem';
+import ProfileActions from './ProfileActions';
 import Logo from './Logo';
 
-interface Profile {
-  id: string;
-  full_name: string | null;
-  email: string;
-}
+// interface Profile {
+//   id: string;
+//   full_name: string | null;
+//   email: string;
+// }
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = React.useState(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  // const [user, setUser] = React.useState(null);
+  // const [profile, setProfile] = useState<Profile | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  useEffect(() => {
-    loadUserAndProfile();
-  }, []);
+  const { user, profile } = useUserProfile();
 
-  const loadUserAndProfile = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+  // useEffect(() => {
+  //   loadUserAndProfile();
+  // }, []);
 
-      if (user) {
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('id, full_name, email')
-          .eq('id', user.id)
-          .single();
+  // const loadUserAndProfile = async () => {
+  //   try {
+  //     const {
+  //       data: { user },
+  //     } = await supabase.auth.getUser();
+  //     setUser(user);
 
-        if (!error) {
-          setProfile(profileData);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    }
-  };
+  //     if (user) {
+  //       const { data: profileData, error } = await supabase
+  //         .from('profiles')
+  //         .select('id, full_name, email')
+  //         .eq('id', user.id)
+  //         .single();
+
+  //       if (!error) {
+  //         setProfile(profileData);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Error loading user profile:', error);
+  //   }
+  // };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -64,10 +69,10 @@ const Navbar = () => {
     { to: '/relationships', icon: Heart, label: 'Relationships' },
     { to: '/reports', icon: BarChart2, label: 'Reports' },
     { to: '/analyze', icon: MessageSquareText, label: 'Analyze' },
-    { to: '/daily-tips', icon: null, label: 'Daily Tips' },
+    { to: '/daily-tips', icon: undefined, label: 'Daily Tips' },
     { to: '/chat', icon: MessageCircle, label: 'Chat' },
     { to: '/biometric-settings', icon: Activity, label: 'Biometrics' },
-    { to: '/preferences', icon: Settings, label: 'Preferences' }
+    { to: '/preferences', icon: Settings, label: 'Preferences' },
   ];
 
   const isCurrentPage = (path: string) => {
@@ -82,70 +87,47 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
+    <nav className='bg-white shadow-lg'>
+      <div className='container mx-auto px-4 py-4'>
+        <div className='flex items-center justify-between'>
+          <Link to='/' className='flex items-center space-x-2'>
             <Logo />
-            <span className="text-xl font-bold text-gray-800">MindfulMingle</span>
+            <span className='text-xl font-bold text-gray-800'>
+              MindfulMingle
+            </span>
           </Link>
-          
+
           {/* Mobile menu button */}
           {user && (
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+              className='md:hidden p-2 text-gray-600 hover:text-gray-900'
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className='h-6 w-6' />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className='h-6 w-6' />
               )}
             </button>
           )}
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className='hidden md:flex items-center space-x-4'>
             {user ? (
               <>
                 {navItems.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`flex items-center space-x-1 px-2 py-1 rounded-lg transition-colors ${
-                      isCurrentPage(item.to)
-                        ? 'bg-rose-50 text-rose-600 font-medium'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    {item.icon && <item.icon className="h-4 w-4" />}
-                    <span>{item.label}</span>
-                  </Link>
+                  <NavItem key={item.to} {...item} />
                 ))}
-                <div className="flex items-center space-x-4">
-                  <Link
-                    to="/profile"
-                    className={`flex items-center space-x-1 px-2 py-1 rounded-lg transition-colors ${
-                      isCurrentPage('/profile')
-                        ? 'bg-rose-50 text-rose-600 font-medium'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    <User className="h-4 w-4" />
-                    <span>{getDisplayName()}</span>
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 px-2 py-1 rounded-lg hover:bg-gray-50"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Sign Out</span>
-                  </button>
+                <div className='flex items-center space-x-4'>
+                  <ProfileActions
+                    displayName={getDisplayName()}
+                    onSignOut={handleSignOut}
+                  />
                 </div>
               </>
             ) : (
               <Link
-                to="/login"
+                to='/login'
                 className={`bg-rose-500 text-white px-6 py-2 rounded-full hover:bg-rose-600 transition-colors ${
                   isCurrentPage('/login') ? 'ring-2 ring-rose-300' : ''
                 }`}
@@ -159,44 +141,21 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {user && (
           <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} mt-4`}>
-            <div className="flex flex-col space-y-2">
+            <div className='flex flex-col space-y-2'>
               {navItems.map((item) => (
-                <Link
+                <NavItem
                   key={item.to}
-                  to={item.to}
+                  {...item}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center space-x-2 p-2 rounded-lg transition-colors ${
-                    isCurrentPage(item.to)
-                      ? 'bg-rose-50 text-rose-600 font-medium'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.icon && <item.icon className="h-5 w-5" />}
-                  <span>{item.label}</span>
-                </Link>
+                />
               ))}
-              <Link
-                to="/profile"
+
+              <ProfileActions
+                displayName={getDisplayName()}
+                onSignOut={handleSignOut}
+                isMobile
                 onClick={() => setIsMenuOpen(false)}
-                className={`flex items-center space-x-2 p-2 rounded-lg transition-colors ${
-                  isCurrentPage('/profile')
-                    ? 'bg-rose-50 text-rose-600 font-medium'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                }`}
-              >
-                <User className="h-5 w-5" />
-                <span>{getDisplayName()}</span>
-              </Link>
-              <button
-                onClick={() => {
-                  handleSignOut();
-                  setIsMenuOpen(false);
-                }}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-50 w-full"
-              >
-                <LogOut className="h-5 w-5" />
-                <span>Sign Out</span>
-              </button>
+              />
             </div>
           </div>
         )}
