@@ -722,7 +722,7 @@ const Login = () => {
         if (error) throw error;
 
         if (data.user) {
-          await createProfile(data.user.id);
+          // await createProfile(data.user.id);
           await sendWelcomeEmail(FormDataLogin.email);
           toast.success(
             'Account created successfully! Please check your email to confirm your account.'
@@ -742,6 +742,13 @@ const Login = () => {
             );
           }
           throw error;
+        }
+
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id;
+
+        if (userId) {
+          await createProfile(userId);
         }
 
         navigate('/dashboard');

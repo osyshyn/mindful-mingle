@@ -1,4 +1,4 @@
-import { CoachingPreferences, OptionType, FormDataLogin } from "../interfaces/interfaces";
+import { CoachingPreferences, OptionType, FormDataLogin, Question } from "../interfaces/interfaces";
 import { FeatureItemProps, BenefitCardProps } from "../pages/Premium";
 import { Brain, Compass,  Leaf, MessageCircle, Activity,  BarChart as ChartBar, } from 'lucide-react';
 
@@ -153,3 +153,80 @@ export const BENEFIT_CARDS: BenefitCardProps[] = [
     Icon: ChartBar
   }
 ];
+
+
+export const QUESTIONS: Question[] = [
+  {
+    id: 1,
+    text: 'How often do you communicate with this person?',
+    category: 'communication',
+  },
+  {
+    id: 2,
+    text: 'How comfortable are you sharing your feelings with them?',
+    category: 'trust',
+  },
+  {
+    id: 3,
+    text: 'How well do they understand your perspective?',
+    category: 'empathy',
+  },
+  {
+    id: 4,
+    text: 'How supported do you feel in this relationship?',
+    category: 'support',
+  },
+  {
+    id: 5,
+    text: 'How effectively do you resolve conflicts together?',
+    category: 'conflict',
+  },
+  { id: 6, text: 'How much do you trust this person?', category: 'trust' },
+  {
+    id: 7,
+    text: 'How well do you handle disagreements?',
+    category: 'conflict',
+  },
+  {
+    id: 8,
+    text: 'How satisfied are you with the quality of time spent together?',
+    category: 'quality',
+  },
+  {
+    id: 9,
+    text: "How well do you respect each other's boundaries?",
+    category: 'boundaries',
+  },
+  {
+    id: 10,
+    text: 'How much mutual growth do you experience in this relationship?',
+    category: 'growth',
+  },
+];
+
+export const SCORE_LABELS: Record<number, string> = {
+  1: 'Poor',
+  5: 'Excellent',
+};
+
+export const RELATIONSHIP_TYPES_DETAIL = {
+  family: 'Family',
+  friend: 'Friend',
+  work: 'Work',
+  romantic: 'Romantic',
+  other: 'Other',
+};
+
+export const STATUS_COLORS = {
+  completed: 'bg-green-100 text-green-700',
+  in_progress: 'bg-blue-100 text-blue-700',
+  not_started: 'bg-gray-100 text-gray-700',
+};
+
+export const RELATIONSHIP_TYPES = [
+  { value: 'family', label: 'Family' },
+  { value: 'friend', label: 'Friend' },
+  { value: 'work', label: 'Work' },
+  { value: 'romantic', label: 'Romantic' },
+  { value: 'other', label: 'Other' }
+] as const;

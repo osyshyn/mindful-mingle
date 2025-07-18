@@ -1,5 +1,10 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { supabase } from './lib/supabase';
@@ -31,7 +36,10 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     // Check current session on mount
     const checkSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
         if (error?.message.includes('session_not_found')) {
           await handleInvalidSession();
         }
@@ -39,14 +47,16 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
         console.error('Session check error:', error);
       }
     };
-    
+
     checkSession();
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         navigate('/login');
-      } else if (event === 'USER_DELETED' || event === 'TOKEN_REFRESHED') {
+      } else if (event === 'TOKEN_REFRESHED') {
         // Check if session is still valid after token refresh
         const { data, error } = await supabase.auth.getUser();
         if (error?.message.includes('session_not_found')) {
@@ -77,29 +87,41 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthWrapper>
-          <div className="min-h-screen bg-gray-50">
+          <div className='min-h-screen bg-gray-50'>
             <Navbar />
-            <div className="container mx-auto px-4 py-8">
+            <div className='container mx-auto px-4 py-8'>
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/reset-confirmation" element={<PasswordResetConfirmation />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/chat" element={<Chat />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/daily-tips" element={<DailyTips />} />
-                <Route path="/preferences" element={<Preferences />} />
-                <Route path="/relationships" element={<Relationships />} />
-                <Route path="/relationships/:id" element={<RelationshipDetail />} />
-                <Route path="/relationships/:id/assess" element={<RelationshipAssessment />} />
-                <Route path="/biometric-settings" element={<BiometricSettings />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/analyze" element={<ConversationAnalysis />} />
-                <Route path="/premium" element={<Premium />} />
+                <Route path='/' element={<Home />} />
+                <Route path='/login' element={<Login />} />
+                <Route path='/reset-password' element={<ResetPassword />} />
+                <Route
+                  path='/reset-confirmation'
+                  element={<PasswordResetConfirmation />}
+                />
+                <Route path='/dashboard' element={<Dashboard />} />
+                <Route path='/chat' element={<Chat />} />
+                <Route path='/profile' element={<Profile />} />
+                <Route path='/daily-tips' element={<DailyTips />} />
+                <Route path='/preferences' element={<Preferences />} />
+                <Route path='/relationships' element={<Relationships />} />
+                <Route
+                  path='/relationships/:id'
+                  element={<RelationshipDetail />}
+                />
+                <Route
+                  path='/relationships/:id/assess'
+                  element={<RelationshipAssessment />}
+                />
+                <Route
+                  path='/biometric-settings'
+                  element={<BiometricSettings />}
+                />
+                <Route path='/reports' element={<Reports />} />
+                <Route path='/analyze' element={<ConversationAnalysis />} />
+                <Route path='/premium' element={<Premium />} />
               </Routes>
             </div>
-            <Toaster position="top-right" />
+            <Toaster position='top-right' />
           </div>
         </AuthWrapper>
       </Router>
