@@ -716,7 +716,7 @@ const Login = () => {
         const { data, error } = await supabase.auth.signUp({
           email: FormDataLogin.email,
           password: FormDataLogin.password,
-          options: { emailRedirectTo: `${window.location.origin}/login` },
+          options: { emailRedirectTo: `${window.location.origin}` },
         });
 
         if (error) throw error;
